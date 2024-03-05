@@ -4,8 +4,10 @@ from scraper_for_nike_talk import scrape_nike_talk_page
 
 #get number of pages programatically 
 total_pages = 40
+
 #page number
 page_number = 1
+
 # URL of the NikeTalk forum
 base_url = 'https://niketalk.com/forums/jordan-brand.7348/'
 
