@@ -1,8 +1,10 @@
 import requests
+import logging
 from bs4 import BeautifulSoup
+from botUtils import parse_number_with_suffix
 
-def scrape_nike_talk_page(url):
-
+def scrape_nike_talk_page(url, order_list):
+    
     # Send a GET request to the URL
     response = requests.get(url)
 
@@ -11,14 +13,13 @@ def scrape_nike_talk_page(url):
         
         # Parse the HTML content of the page
         soup = BeautifulSoup(response.content, 'html.parser')
-        
         # Find all the elements containing forum topics
         topics = soup.find_all('div', class_='structItem')
         
         for element in topics:
             # Find the <div> element containing the topic title
             title_div = element.find('div', class_='structItem-title')
-            
+
             # Check if title_div exists
             if title_div:
                 # Find the <a> element within the title <div>
@@ -41,16 +42,18 @@ def scrape_nike_talk_page(url):
                         if views_dd:
                             # Extract the text content (number of views)
                             views = views_dd.text.strip()
-                            print("Topic Title:", topic_title, "Views:", views)
+                            int_views = parse_number_with_suffix(views)
+                            instanceDict = {int_views : topic_title}
+                            order_list.append(instanceDict)
                         else:
-                            print("No <dd> element found within the views <dl>")
+                            logging.debug("No <dd> element found within the views <dl>")
                     else:
-                        print("No views <dl> found for the topic")
+                        logging.debug("No views <dl> found for the topic")
                 else:
-                    print("No <a> element found within the title <div>")
+                    logging.debug("No <a> element found within the title <div>")
             else:
-                print("No title <div> found for the topic")
-        return None        
+                logging.debug("No title <div> found for the topic")
+        return order_list    
     else:
-        print("Failed to retrieve the webpage")
+        logging.debug("Failed to retrieve the webpage")
         return None
